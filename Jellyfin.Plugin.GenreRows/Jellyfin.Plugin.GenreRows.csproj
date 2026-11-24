@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Built for Jellyfin 12.4 (.NET 10). Build with: dotnet publish -c Release -o out -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <JellyfinPackageVersion>12.4.0</JellyfinPackageVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RootNamespace>Jellyfin.Plugin.GenreRows</RootNamespace>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Jellyfin.Controller" Version="$(JellyfinPackageVersion)" ExcludeAssets="runtime" />
+    <PackageReference Include="Jellyfin.Model" Version="$(JellyfinPackageVersion)" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Configuration\configPage.html" />
+    <EmbeddedResource Include="Configuration\configPage.html" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Genre Rows</title>
+</head>
+<body>
+<div id="GenreRowsConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox,emby-textarea">
+    <div data-role="content">
+        <div class="content-primary">
+            <form id="GenreRowsConfigForm">
+                <div class="sectionTitleContainer flex align-items-center">
+                    <h2 class="sectionTitle">Genre Rows</h2>
+                </div>
+                <p>
+                    Adds one <b>Home Screen Sections</b> row per genre, such as "Comedy Movies" or "Drama Shows".
+                    After saving, turn the rows on and put them in order in the
+                    <b>Home Screen Sections</b> settings, like any other section.
+                </p>
+
+                <div class="selectContainer">
+                    <label class="selectLabel" for="RowMode">Rows</label>
+                    <select is="emby-select" id="RowMode" class="emby-select-withcolor emby-select">
+                        <option value="Separate">Separate rows for movies and shows ("Comedy Movies", "Comedy Shows")</option>
+                        <option value="Combined">One row per genre, movies and shows mixed</option>
+                        <option value="MoviesOnly">Movies only</option>
+                        <option value="ShowsOnly">Shows only</option>
+                    </select>
+                </div>
+
+                <div class="inputContainer">
+                    <label class="inputLabel inputLabelUnfocused" for="IncludedGenres">Genres to make rows for</label>
+                    <textarea is="emby-textarea" id="IncludedGenres" class="emby-textarea" rows="2"></textarea>
+                    <div class="fieldDescription">Comma-separated, e.g. <i>Action, Comedy, Animation</i>. Leave empty to use your biggest genres automatically.</div>
+                </div>
+
+                <div class="inputContainer">
+                    <label class="inputLabel inputLabelUnfocused" for="ExcludedGenres">Genres to skip</label>
+                    <textarea is="emby-textarea" id="ExcludedGenres" class="emby-textarea" rows="2"></textarea>
+                    <div class="fieldDescription">Comma-separated. These never get a row.</div>
+                </div>
+
+                <div class="fieldDescription" id="AvailableGenres" style="margin-bottom:1.5em;"></div>
+
+                <div class="inputContainer">
+                    <label class="inputLabel inputLabelUnfocused" for="MaxGenres">Maximum number of genres (automatic mode)</label>
+                    <input id="MaxGenres" type="number" is="emby-input" min="1" max="50" />
+                </div>
+
+                <div class="inputContainer">
+                    <label class="inputLabel inputLabelUnfocused" for="MinItemsPerRow">Skip a genre if it has fewer than this many movies (or shows)</label>
+                    <input id="MinItemsPerRow" type="number" is="emby-input" min="1" max="100" />
+                </div>
+
+                <div class="inputContainer">
+                    <label class="inputLabel inputLabelUnfocused" for="ItemsPerRow">Items per row</label>
+                    <input id="ItemsPerRow" type="number" is="emby-input" min="1" max="100" />
+                </div>
+
+                <div class="selectContainer">
+                    <label class="selectLabel" for="SortBy">Order inside each row</label>
+                    <select is="emby-select" id="SortBy" class="emby-select-withcolor emby-select">
+                        <option value="Random">Random (changes every visit)</option>
+                        <option value="DateCreated">Recently added</option>
+                        <option value="PremiereDate">Release date (newest first)</option>
+                        <option value="CommunityRating">Rating (highest first)</option>
+                        <option value="SortName">Title (A–Z)</option>
+                    </select>
+                </div>
+
+                <div class="checkboxContainer">
+                    <label class="emby-checkbox-label">
+                        <input id="HideWatched" type="checkbox" is="emby-checkbox" />
+                        <span>Hide watched items</span>
+                    </label>
+                </div>
+
+                <div>
+                    <button is="emby-button" type="submit" class="raised button-submit block emby-button">
+                        <span>Save</span>
+                    </button>
+                </div>
+                <div class="fieldDescription">
+                    Saving updates the rows straight away. Rows for genres you remove stay listed in Home Screen Sections until Jellyfin restarts.
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        (function () {
+            var pluginId = '620eedb4-ad26-47d7-a878-f42a41da0db2';
+            var page = document.querySelector('#GenreRowsConfigPage');
+            var textFields = ['IncludedGenres', 'ExcludedGenres'];
+            var numberFields = ['MaxGenres', 'ItemsPerRow', 'MinItemsPerRow'];
+            var selectFields = ['RowMode', 'SortBy'];
+            var checkFields = ['HideWatched'];
+
+            function byId(id) { return page.querySelector('#' + id); }
+
+            function showAvailableGenres() {
+                var target = byId('AvailableGenres');
+                var url = ApiClient.getUrl('Genres', {
+                    userId: ApiClient.getCurrentUserId(),
+                    IncludeItemTypes: 'Movie,Series',
+                    Recursive: true,
+                    SortBy: 'SortName',
+                    EnableImages: false
+                });
+                ApiClient.getJSON(url).then(function (res) {
+                    var names = (res.Items || []).map(function (g) { return g.Name; });
+                    target.textContent = names.length ? 'Genres in your libraries: ' + names.join(', ') : '';
+                }).catch(function () { target.textContent = ''; });
+            }
+
+            page.addEventListener('pageshow', function () {
+                Dashboard.showLoadingMsg();
+                ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                    textFields.forEach(function (f) { byId(f).value = config[f] || ''; });
+                    numberFields.forEach(function (f) { byId(f).value = config[f]; });
+                    selectFields.forEach(function (f) { byId(f).value = config[f]; });
+                    checkFields.forEach(function (f) { byId(f).checked = !!config[f]; });
+                    Dashboard.hideLoadingMsg();
+                });
+                showAvailableGenres();
+            });
+
+            page.querySelector('#GenreRowsConfigForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                Dashboard.showLoadingMsg();
+                ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                    textFields.forEach(function (f) { config[f] = byId(f).value.trim(); });
+                    numberFields.forEach(function (f) { config[f] = parseInt(byId(f).value, 10) || 1; });
+                    selectFields.forEach(function (f) { config[f] = byId(f).value; });
+                    checkFields.forEach(function (f) { config[f] = byId(f).checked; });
+                    ApiClient.updatePluginConfiguration(pluginId, config).then(function (result) {
+                        Dashboard.processPluginConfigurationUpdateResult(result);
+                    });
+                });
+                return false;
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

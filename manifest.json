@@ -1,0 +1,20 @@
+[
+  {
+    "guid": "620eedb4-ad26-47d7-a878-f42a41da0db2",
+    "versions": [
+      {
+        "version": "1.0.0.0",
+        "changelog": "First release: genre rows for Home Screen Sections.",
+        "targetAbi": "12.4.0.0",
+        "sourceUrl": "https://raw.githubusercontent.com/krivera98/jellyfin-plugin-genre-rows/main/releases/genre-rows_1.0.0.0.zip",
+        "checksum": "42fcbb9b0545d8391da13c138ad4f7f4",
+        "timestamp": "2026-11-24T22:21:30Z"
+      }
+    ],
+    "name": "Genre Rows",
+    "description": "Adds a Home Screen Sections row for each genre of movies and shows.",
+    "overview": "Rows like \"Comedy Movies\" and \"Drama Shows\" on the home screen. Requires the Home Screen Sections plugin.",
+    "owner": "krivera98",
+    "category": "General"
+  }
+]
