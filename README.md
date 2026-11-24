@@ -35,6 +35,17 @@ Built for **Jellyfin 12.4**.
 Jellyfin checks the repository for new versions. They appear under *Updates*, and Jellyfin installs them
 by itself if automatic updates are on.
 
+## If the rows don't appear on the home screen
+
+- **User Override is ticked.** In the Home Screen Sections settings, a row with *User Override* ticked
+  only appears for users who turned it on in their own **Modular Home** settings (in the user menu).
+  Users who saved their own list before the genre rows existed won't get the new rows.
+  Untick *User Override* to show the rows to everyone, or let each user turn them on themselves.
+- **The home screen is cached.** Home Screen Sections keeps each user's layout in server memory for up to an hour,
+  so changes may not show straight away. Restart Jellyfin, then reload the page with Ctrl+F5.
+- **Rows with the same Order number** are grouped and shuffled on every visit.
+  Give each row its own number for a fixed order.
+
 ## Settings
 
 | Setting | What it does |
